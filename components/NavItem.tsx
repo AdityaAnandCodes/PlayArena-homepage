@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState ,ReactNode } from 'react';
 
-const NavItem = ({ label, children, hasDropdown = true }) => {
+const NavItem = ({ label, children, hasDropdown = true }: { label: string, children: ReactNode, hasDropdown?: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -38,7 +38,7 @@ const NavItem = ({ label, children, hasDropdown = true }) => {
 };
 
 // Example dropdown item component for consistent styling
-const DropdownItem = ({ children, onClick }) => (
+const DropdownItem = ({ children, onClick }: { children: ReactNode, onClick: () => void }) => (
   <div 
     className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
     onClick={onClick}

@@ -1,26 +1,44 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
+import { Menu, X, Phone, MapPin, ChevronDown } from 'lucide-react';
 
+interface NavItemProps {
+  text: string;
+  children?: React.ReactNode;
+  isMobile?: boolean;
+}
 
-const NavItem = ({ text, children }) => {
+const NavItem: React.FC<NavItemProps> = ({ text, children, isMobile = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   
+  const handleClick = () => {
+    if (isMobile) {
+      setIsOpen(!isOpen);
+    }
+  };
+  
   return (
-    <div className="relative" onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
-      <div className="flex items-center gap-1 cursor-pointer">
-        <span>{text}</span>
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+    <div 
+      className="relative w-full"
+      onMouseEnter={() => !isMobile && setIsOpen(true)} 
+      onMouseLeave={() => !isMobile && setIsOpen(false)}
+      onClick={handleClick}
+    >
+      <div className="flex items-center justify-between cursor-pointer py-2 px-4 hover:bg-gray-800 rounded-md">
+        <span className="text-white">{text}</span>
+        <ChevronDown 
+          className={`w-4 h-4 text-white transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        />
       </div>
       {isOpen && children && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+        <div className={`
+          ${isMobile 
+            ? 'bg-gray-900 mt-1 rounded-md w-full' 
+            : 'absolute top-full left-0 mt-2 w-48 bg-gray-900 rounded-md shadow-lg'
+          } 
+          py-2 overflow-hidden
+        `}>
           {children}
         </div>
       )}
@@ -29,52 +47,124 @@ const NavItem = ({ text, children }) => {
 };
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <nav className="absolute top-0 left-0 z-20 flex justify-between items-center px-6 lg:px-[156px] py-3 bg-opacity-95 bg-black w-full ">
-      <Logo />
-      <div className="flex gap-6 items-center text-white font-normal text-base">
-        <NavItem text="Play" />
-        <NavItem text="Participate" />
-        <NavItem text="Host" />
-        <NavItem text="F&B" />
-      </div>
-      <div className="flex gap-4">
-        <button className="text-white">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <nav className={`
+      fixed top-0 left-0 right-0 z-50
+      transition-all duration-300
+      ${isScrolled ? 'bg-black shadow-lg' : 'bg-black bg-opacity-95'}
+    `}>
+      <div className="max-w-7xl mx-auto">
+        {/* Main Navbar */}
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          <Logo />
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex gap-6 items-center text-white font-normal text-base">
+            <NavItem text="Play" />
+            <NavItem text="Participate" />
+            <NavItem text="Host" />
+            <NavItem text="F&B" />
+          </div>
+
+          {/* Desktop Contact Icons */}
+          <div className="hidden lg:flex gap-4">
+            <button className="text-white hover:text-gray-300 transition-colors">
+              <Phone className="w-6 h-6" />
+            </button>
+            <button className="text-white hover:text-gray-300 transition-colors">
+              <MapPin className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden text-white p-2 rounded-md hover:bg-gray-800 transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-            />
-          </svg>
-        </button>
-        <button className="text-white">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-        </button>
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        <div 
+          className={`
+            lg:hidden
+            transition-all duration-300 ease-in-out
+            bg-black border-t border-gray-800
+            ${isOpen ? 'visible opacity-100' : 'invisible opacity-0 h-0'}
+          `}
+        >
+          <div className="px-4 py-4 space-y-3">
+            <NavItem text="Play" isMobile>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 1
+              </div>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 2
+              </div>
+            </NavItem>
+            <NavItem text="Participate" isMobile>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 1
+              </div>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 2
+              </div>
+            </NavItem>
+            <NavItem text="Host" isMobile>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 1
+              </div>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 2
+              </div>
+            </NavItem>
+            <NavItem text="F&B" isMobile>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 1
+              </div>
+              <div className="px-4 py-2 text-white hover:bg-gray-800">
+                Dropdown Item 2
+              </div>
+            </NavItem>
+            
+            {/* Mobile Contact Buttons */}
+            <div className="flex flex-col gap-3 pt-4 border-t border-gray-800">
+              <button className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md w-full">
+                <Phone className="w-5 h-5" />
+                <span>Contact Us</span>
+              </button>
+              <button className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md w-full">
+                <MapPin className="w-5 h-5" />
+                <span>Find Location</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
   );

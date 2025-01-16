@@ -43,7 +43,15 @@ const PixelSvg = () => (
   </svg>
 );
 
-const VideoCard = ({ title, description, icon: Icon, bgColor, isHovered }) => {
+interface VideoCardProps {
+  title: string;
+  description: string;
+  icon: React.ComponentType;
+  bgColor: string;
+  isHovered: boolean;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({ title, description, icon: Icon, bgColor, isHovered }) => {
   return (
     <div className="relative h-20 md:h-28">
       {/* Container that moves up on hover */}
@@ -100,9 +108,9 @@ const VideoCard = ({ title, description, icon: Icon, bgColor, isHovered }) => {
 
 const HeroSection = () => {
   const [activeVideo, setActiveVideo] = useState('prime');
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const videoRefs = useRef({});
-  const containerRef = useRef(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const cards = [
     {
@@ -177,14 +185,13 @@ const HeroSection = () => {
         {cards.map((card) => (
           <video
             key={card.id}
-            ref={el => videoRefs.current[card.id] = el}
+            ref={el => { videoRefs.current[card.id] = el; }}
             className={`absolute inset-0 w-full max-h-dvh object-cover transition-opacity duration-700
               ${activeVideo === card.id ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
             autoPlay
             muted
             loop
             playsInline
-            loading="eager"
           >
             <source src={card.videoUrl} type="video/mp4" />
           </video>
@@ -212,3 +219,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
