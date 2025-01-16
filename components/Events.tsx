@@ -57,21 +57,21 @@ const EventsSection = () => {
       icon: Cake,
       description:
         'Thrilling activities, exciting games, and delicious food—our custom packages ensure unforgettable experiences for all ages!',
-      imageUrl: '/Images/M-Arcade.png',
+      imageUrl: '/Images/BirthdayBash.jpg',
     },
     {
       title: 'Corporate Events',
       icon: Briefcase,
       description:
         'Nothing like a game to get the teamwork going. Talk to us to find out more about our corporate packages for offsites, team building activities, leadership meets, outbound learning and more.',
-      imageUrl: '/Images/M-Arcade.png',
+      imageUrl: '/Images/CorporateEvents.jpg',
     },
     {
       title: 'Play Dates',
       icon: Heart,
       description:
         'Experience Play Dates, any day of the week, enjoy this special offer and quality time with your partner. Perfect for fun and connection!',
-      imageUrl: '/Images/M-Arcade.png',
+      imageUrl: '/Images/PlayDate.jpg',
     },
   ];
 
