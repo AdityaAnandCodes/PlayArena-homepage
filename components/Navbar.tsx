@@ -83,7 +83,7 @@ const PlayDropdown = ({ isMobile = false }) => {
 
   return (
     <div className={`
-        ${isMobile ? 'w-full' : 'absolute top-5 -left-80 min-w-[1200px] scale-90 bg-white shadow-lg'}
+        ${isMobile ? 'w-full' : 'absolute -top-3 -left-80 min-w-[1200px] scale-95 bg-white shadow-lg'}
         z-50
     `}>
       <div className="max-w-7xl ">
