@@ -31,7 +31,7 @@ export const UnionSvg = () => (
 );
 
 export const JuniorSvg = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28.003" viewBox="0 0 20 20.003"> <g id="Group_562" data-name="Group 562" transform="translate(-498.772 5121.579)"> <path id="Path_100" data-name="Path 100" d="M22.744,861.428a5.662,5.662,0,1,0-7.974-7.979A5.661,5.661,0,1,0,6.8,861.428a5.658,5.658,0,1,0,7.971,7.971,5.66,5.66,0,1,0,7.974-7.971m-5.518,2.447H12.318v-4.9h4.907Z" transform="translate(494 -5973)"></path> </g> </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28.003" viewBox="0 0 20 20.003" className="fill-current">  <g id="Group_562" data-name="Group 562" transform="translate(-498.772 5121.579)"> <path id="Path_100" data-name="Path 100" d="M22.744,861.428a5.662,5.662,0,1,0-7.974-7.979A5.661,5.661,0,1,0,6.8,861.428a5.658,5.658,0,1,0,7.971,7.971,5.66,5.66,0,1,0,7.974-7.971m-5.518,2.447H12.318v-4.9h4.907Z" transform="translate(494 -5973)"></path> </g> </svg>
 );
 
 export const PixelSvg = () => (
