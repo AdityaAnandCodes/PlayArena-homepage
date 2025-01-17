@@ -30,7 +30,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
     <div className="relative h-20 md:h-28 hidden md:block">
       <div className={`absolute bottom-0 w-full transition-all duration-300`}>
         <div className={`relative w-full ${bgColor} ${
-          isHovered || isActive ? 'h-40 md:h-48' : 'h-16 md:h-20'
+          isHovered || isActive ? 'h-40 md:h-56 lg:h-48' : 'h-16 md:h-20'
         } transition-all duration-300`}>
           <div className="absolute inset-0" />
           
@@ -171,7 +171,7 @@ const HeroSection = () => {
       description: 'Toddler-sized fun for little champs',
       icon: JuniorSvg,
       videoUrl: '/Videos/junior-10sec.mp4',
-      bgColor: 'bg-[#DCFFE7]',
+      bgColor: 'bg-[#80ed99]',
       link : "https://playarena.in/activity/little-gym/"
     },
     {
@@ -180,7 +180,7 @@ const HeroSection = () => {
       description: "Shoot, race and more in the gamer's den",
       icon: PixelSvg,
       videoUrl: '/Videos/pixel-10sec-2.mp4',
-      bgColor: 'bg-[#E7FFF4]',
+      bgColor: 'bg-[#c7f9cc]',
       link : "https://playarena.in/activity/vr-coaster/"
     }
   ];
