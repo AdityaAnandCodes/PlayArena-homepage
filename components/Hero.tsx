@@ -213,104 +213,117 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <div className="relative">
-      <h1 className="sr-only">Play Arena Activities</h1>
-      <section 
-        ref={containerRef} 
-        className="relative w-full h-screen overflow-hidden bg-black"
-        aria-label="Featured activities showcase"
-      >
-        <div className="absolute inset-0" aria-hidden="true">
-          {cards.map((card) => (
-            <video
+     <div className="relative">
+    <h1 className="sr-only">Play Arena Activities</h1>
+    <section 
+      ref={containerRef} 
+      className="relative w-full h-screen overflow-hidden bg-black"
+      aria-label="Featured activities showcase"
+    >
+      {/* Video Container */}
+      <div className="absolute inset-0">
+        {cards.map((card) => (
+          <video
+            key={card.id}
+            ref={el => { videoRefs.current[card.id] = el; }}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700
+              ${activeVideo === card.id ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+            autoPlay={activeVideo === card.id}
+            muted
+            loop
+            playsInline
+            aria-hidden="true"
+          >
+            <source src={card.videoUrl} type="video/mp4" />
+          </video>
+        ))}
+      </div>
+
+      {/* Cards Container */}
+      <div className="absolute bottom-0 w-full z-20">
+        {/* Mobile Interface */}
+        <div 
+          className="md:hidden w-full bg-black p-4 flex justify-between items-center"
+        >
+          {cards.map((card, index) => (
+            <div
               key={card.id}
-              ref={el => { videoRefs.current[card.id] = el; }}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700
-                ${activeVideo === card.id ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-              autoPlay={activeVideo === card.id}
-              muted
-              loop
-              playsInline
-              aria-hidden="true"
+              id={`tab-${card.id}`}
+              role="tab"
+              aria-selected={activeVideo === card.id}
+              aria-controls={`tabpanel-${card.id}`}
+              tabIndex={activeVideo === card.id ? 0 : -1}
+              onClick={() => setActiveVideo(card.id)}
+              onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
+              className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
             >
-              <source src={card.videoUrl} type="video/mp4" />
-            </video>
+              <VideoCard 
+                {...card} 
+                isHovered={hoveredCard === card.id} 
+                isActive={activeVideo === card.id}
+                isMobile={true}
+              />
+            </div>
           ))}
         </div>
 
-        <div className="absolute bottom-0 w-full z-20">
-          {/* Mobile Interface */}
-          <nav 
-            className="md:hidden w-full bg-black p-4 flex justify-between items-center"
+        {/* Desktop Interface */}
+        <div className="hidden md:block">
+          <div 
             role="tablist"
-            aria-label="Mobile activity categories"
+            aria-label="Activity categories"
+            className="grid grid-cols-5 gap-0"
           >
-            {cards.map((card) => (
+            {cards.map((card, index) => (
               <div
                 key={card.id}
+                id={`tab-${card.id}`}
                 role="tab"
-                tabIndex={0}
                 aria-selected={activeVideo === card.id}
-                aria-controls={`content-${card.id}`}
-                aria-label={`${card.title} - ${card.description}`}
-                className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
-                onClick={() => setActiveVideo(card.id)}
+                aria-controls={`tabpanel-${card.id}`}
+                tabIndex={activeVideo === card.id ? 0 : -1}
+                className="relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                onMouseEnter={() => {
+                  setActiveVideo(card.id);
+                  setHoveredCard(card.id);
+                }}
+                onMouseLeave={() => setHoveredCard(null)}
                 onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
+                onFocus={() => setActiveVideo(card.id)}
               >
                 <VideoCard 
                   {...card} 
                   isHovered={hoveredCard === card.id} 
                   isActive={activeVideo === card.id}
-                  isMobile={true}
+                  isMobile={false}
                 />
               </div>
             ))}
-          </nav>
-
-          {/* Desktop Interface */}
-          <nav 
-            className="hidden md:block"
-            role="tablist"
-            aria-label="Activity categories"
-          >
-            <div className="grid grid-cols-5 gap-0">
-              {cards.map((card) => (
-                <div
-                  key={card.id}
-                  role="tab"
-                  tabIndex={0}
-                  aria-selected={activeVideo === card.id}
-                  aria-controls={`content-${card.id}`}
-                  aria-label={`${card.title} - ${card.description}`}
-                  className="relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-                  onMouseEnter={() => {
-                    setActiveVideo(card.id);
-                    setHoveredCard(card.id);
-                  }}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
-                  onFocus={() => setActiveVideo(card.id)}
-                >
-                  <VideoCard 
-                    {...card} 
-                    isHovered={hoveredCard === card.id} 
-                    isActive={activeVideo === card.id}
-                    isMobile={false}
-                  />
-                </div>
-              ))}
-            </div>
-          </nav>
+          </div>
         </div>
+      </div>
 
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+      {/* Tab Panels */}
+      {cards.map((card) => (
+        <div
+          key={card.id}
+          id={`tabpanel-${card.id}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${card.id}`}
+          className="sr-only"
         >
-          Skip to main content
-        </a>
-      </section>
-    </div>
+          {card.description}
+        </div>
+      ))}
+
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+      >
+        Skip to main content
+      </a>
+    </section>
+  </div>
   );
 };
 
