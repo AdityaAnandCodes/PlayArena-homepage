@@ -99,7 +99,7 @@ const PlayDropdown = ({ isMobile = false }) => {
               <div className="bg-white">
                 {category.items.map((item, idx) => (
                   <div key={idx} className="px-6 py-3 text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-none">
-                    <Link href={item.link} aria-label='nav-link'>
+                    <Link href={item.link}>
                       <div>{item.name}</div>
                     </Link>
                   </div>
@@ -129,7 +129,7 @@ const MobilePlayDropdown = () => {
           <div className="bg-white">
             {category.items.map((item, idx) => (
               <div key={idx} className="px-4 py-3 text-sm border-b border-gray-100 last:border-none">
-                <Link href={item.link} aria-label='mobile-links'>
+                <Link href={item.link}>
                   <div>{item.name}</div>
                 </Link>
               </div>
@@ -141,40 +141,75 @@ const MobilePlayDropdown = () => {
   );
 };
 
-
 interface NavItemProps {
   text: string;
   dropdown?: boolean;
   children?: React.ReactNode;
   isMobile?: boolean;
+  'aria-haspopup'?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ text, dropdown, children, isMobile = false }) => {
+const NavItem: React.FC<NavItemProps> = ({ text, dropdown, children, isMobile = false, 'aria-haspopup': hasPopup }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      setIsOpen(!isOpen);
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
   
   return (
     <div 
       className="relative"
       onMouseEnter={() => !isMobile && setIsOpen(true)}
-      onMouseLeave={() => !isMobile && setIsOpen(false)}
-      onClick={() => isMobile && setIsOpen(!isOpen)}
+      onMouseLeave={() => !isMobile && !isFocused && setIsOpen(false)}
+      role="none"
     >
-      <div className="flex items-center gap-2 cursor-pointer py-2 px-4">
-        <span className={`${text === 'Play' ? 'text-white' : 'text-white'}`}>
-          {text}
-        </span>
-        <ChevronDown 
-          className={`w-4 h-4 ${text === 'Play' ? 'text-white' : 'text-white'} 
-          transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </div>
-      {isOpen && dropdown && (
-        isMobile ? <MobilePlayDropdown /> : <PlayDropdown />
+      <button
+        className={`
+          flex items-center gap-2 cursor-pointer py-2 px-4
+          focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
+          rounded-md ${isMobile ? 'w-full text-left' : ''}
+        `}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        aria-expanded={isOpen}
+        aria-haspopup={hasPopup}
+        aria-controls={`${text.toLowerCase()}-menu`}
+        aria-label={`${text} navigation section`}
+      >
+        <span className="text-white">{text}</span>
+        {hasPopup && (
+          <ChevronDown 
+            className={`w-4 h-4 text-white transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            aria-hidden="true"
+          />
+        )}
+      </button>
+      {isOpen && (
+        <div
+          id={`${text.toLowerCase()}-menu`}
+          className={isMobile ? 'w-full' : 'absolute top-full left-0'}
+          role="menu"
+          aria-label={`${text} submenu`}
+        >
+          {dropdown ? (
+            isMobile ? <MobilePlayDropdown /> : <PlayDropdown />
+          ) : (
+            children
+          )}
+        </div>
       )}
-      {isOpen && children && children}
     </div>
   );
 };
+
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -191,208 +226,192 @@ const Navbar = () => {
   }, []);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, []);
-
-  return (<nav 
-      className={`
-        fixed top-0 left-0 right-0 z-50
-        transition-all duration-300
-        ${isScrolled ? 'bg-black shadow-lg' : 'bg-black bg-opacity-95'}
-      `}
-      role="navigation"
-      aria-label="Main navigation"
-    >
+  return (
+    <nav role="navigation"
+      aria-label="Main navigation" className={`
+      fixed top-0 left-0 right-0 z-50
+      transition-all duration-300
+      ${isScrolled ? 'bg-black shadow-lg' : 'bg-black bg-opacity-95'}
+    `}>
       <div className="max-w-7xl mx-auto">
+        {/* ... (rest of the navbar structure remains the same) */}
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
           <Logo />
 
           {/* Desktop Navigation */}
-          <div 
-            className="hidden lg:flex gap-6 items-center"
-            role="menubar"
-            aria-label="Desktop navigation"
-          >
-            <NavItem 
-              text="Play" 
-              dropdown 
-              aria-haspopup="true"
-              aria-expanded={isOpen}
-            />
-            <NavItem 
-              text="Participate"
-              aria-haspopup="true"
-              aria-expanded={isOpen}
-            >
-              <div 
-                className="absolute top-full left-0 bg-white shadow-lg p-4 w-64" 
-                role="menu" 
-                aria-label="Participate submenu"
-              >
+          <div className="hidden lg:flex gap-6 items-center">
+            <NavItem text="Play" dropdown aria-haspopup={true} />
+            <NavItem text="Participate" aria-haspopup={true}>
+              <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
                 <div className="space-y-4">
-                  <NavLink
-                    href="https://playarena.in/academies/"
-                    title="Learn & Master"
-                    description="Join one of our academies to learn And master a sport."
-                  />
-                  <NavLink
-                    href="https://playarena.in/event/"
-                    title="Events at PLaY"
-                    description="Join the community to celebrate special moments. Screenings..."
-                  />
+                  <div>
+                    <Link href="https://playarena.in/academies/">
+                    <h3 className="font-medium">Learn & Master</h3>
+                    <p className="text-sm text-gray-600">Join one of our academies to learn And master a sport.</p>
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://playarena.in/event/">
+                    <h3 className="font-medium">Events at PLaY</h3>
+                    <p className="text-sm text-gray-600">Join the community to celebrate special moments. Screenings...</p>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </NavItem>
-            
-            <NavItem 
-              text="Host"
-              aria-haspopup="true"
-              aria-expanded={isOpen}
-            >
-              <div 
-                className="absolute top-full left-0 bg-white shadow-lg p-4 w-64"
-                role="menu"
-                aria-label="Host submenu"
-              >
+            <NavItem text="Host" aria-haspopup={true}>
+              <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
                 <div className="space-y-4">
-                  <NavLink
-                    href="https://playarena.in/birthdays/"
-                    title="Birthdays at PLaY"
-                    description="Celebrate Memorable Birthdays Here!"
-                  />
-                  <NavLink
-                    href="https://playarena.in/corporates-at-play/"
-                    title="Corporate events"
-                    description="Dynamic events and experiences"
-                  />
-                  <NavLink
-                    href="https://playarena.in/playdates/"
-                    title="Perfect Dates at PLaY"
-                    description="Connecting with or without a reason to celebrate"
-                  />
-                  <NavLink
-                    href="https://playarena.in/enquiry/"
-                    title="Plan your Event"
-                    description="Fill out a form to make an enquiry"
-                  />
+                  <div>
+                    <Link href="https://playarena.in/birthdays/">
+                    <h3 className="font-medium">Birthdays at PLaY</h3>
+                    <p className="text-sm text-gray-600">Celebrate Memorable Birthdays Here!</p>
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://playarena.in/corporates-at-play/">
+                    <h3 className="font-medium">Corporate events</h3>
+                    <p className="text-sm text-gray-600">Dynamic events and experiences</p>
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://playarena.in/playdates/">
+                    <h3 className="font-medium">Perfect Dates at PLaY</h3>
+                    <p className="text-sm text-gray-600">Connecting with or without a reason to celebrate</p>
+                    </Link>
+                  </div>
+                  <div>
+                    <Link href="https://playarena.in/enquiry/">
+                    <h3 className="font-medium">Plan your Event</h3>
+                    <p className="text-sm text-gray-600">Fill out a form to make an enquiry</p>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </NavItem>
-
-            <NavItem 
-              text="F&B"
-              aria-haspopup="true"
-              aria-expanded={isOpen}
-            >
-              <div 
-                className="absolute top-full left-0 bg-white shadow-lg p-4 w-64"
-                role="menu"
-                aria-label="F&B submenu"
-              >
-                <div className="space-y-4">
-                  <NavLink
-                    href="https://playarena.in/foodcourt/"
-                    title="Food Court"
-                    description="From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest."
-                  />
-                  <NavLink
-                    href="https://playarena.in/restaurant/restaurant-1/"
-                    title="Restaurant"
-                    description="From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest that's sure to satisfy your cravings."
-                  />
-                </div>
-              </div>
-            </NavItem>
+            <NavItem text="F&B" aria-haspopup={true}>
+  <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
+    <div className="space-y-4">
+      <div>
+        <Link href="https://playarena.in/foodcourt/">
+        <h3 className="font-medium">Food Court</h3>
+        <p className="text-sm text-gray-600">
+          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest.
+        </p>
+        </Link>
+      </div>
+      <div>
+        <Link href="https://playarena.in/restaurant/restaurant-1/">
+        <h3 className="font-medium">Restaurant</h3>
+        <p className="text-sm text-gray-600">
+          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest that’s sure to satisfy your cravings.
+        </p>
+        </Link>
+      </div>
+    </div>
+  </div>
+</NavItem>
           </div>
 
           {/* Contact Icons */}
-          <div className="hidden lg:flex gap-6">
-            <Link 
-              href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" 
-              className="text-white hover:text-gray-300 transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
-              aria-label="Contact us on WhatsApp"
-            >
-              <Phone className="w-6 h-6" aria-hidden="true" />
+          <div className="hidden lg:flex gap-4">
+            <Link href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" className="text-white hover:text-gray-300 transition-colors">
+              <Phone className="w-6 h-6" />
             </Link>
-            <Link 
-              href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/" 
-              className="text-white hover:text-gray-300 transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
-              aria-label="Find us on Google Maps"
-            >
-              <MapPin className="w-6 h-6" aria-hidden="true" />
+            <Link href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/data=!3m2!1%5B%E2%80%A6%5D1!16s%2Fg%2F124yf6tmx?entry=tts&g_ep=EgoyMDI0MDgyNi4wKgBIAVAD" className="text-white hover:text-gray-300 transition-colors">
+              <MapPin className="w-6 h-6" />
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden text-white p-2 hover:bg-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+            className="lg:hidden text-white p-2"
             onClick={() => setIsOpen(!isOpen)}
-            aria-expanded={isOpen}
-            aria-controls="mobile-menu"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? 
-              <X className="w-6 h-6" aria-hidden="true" /> : 
-              <Menu className="w-6 h-6" aria-hidden="true" />
-            }
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         <div
-          id="mobile-menu"
           className={`
             lg:hidden
             transition-all duration-300 ease-in-out
             ${isOpen ? 'max-h-screen' : 'max-h-0 overflow-hidden'}
           `}
-          role="menu"
-          aria-label="Mobile menu"
-          hidden={!isOpen}
         >
           <div className="bg-black border-t border-gray-800">
-            <NavItem text="Play" dropdown isMobile aria-haspopup="true" />
-            <NavItem text="Participate" isMobile aria-haspopup="true">
-              <div 
-                className="bg-black p-4 space-y-4" 
-                role="menu"
-                aria-label="Mobile participate menu"
-              >
-                <MobileNavLink
-                  href="https://playarena.in/academies/"
-                  title="Learn & Master"
-                  description="Join one of our academies to learn And master a sport."
-                />
-                <MobileNavLink
-                  href="https://playarena.in/event/"
-                  title="Events at PLaY"
-                  description="Join the community to celebrate special moments. Screenings..."
-                />
+            <NavItem text="Play" dropdown isMobile />
+            <NavItem text="Participate" isMobile>
+              <div className="bg-black p-4 space-y-4">
+                <div>
+                   <Link href="https://playarena.in/academies/">
+                  <h3 className="text-white font-medium">Learn & Master</h3>
+                  <p className="text-sm text-gray-400">Join one of our academies to learn And master a sport.</p>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://playarena.in/event/">
+                    <h3 className="font-medium">Events at PLaY</h3>
+                    <p className="text-sm text-gray-600">Join the community to celebrate special moments. Screenings...</p>
+                    </Link>
+                </div>
               </div>
             </NavItem>
-            
-            {/* Similar pattern for other mobile menu items */}
-            
+             <NavItem text="Host" isMobile>
+              <div className="bg-black p-4 space-y-4">
+                <div>
+                  <Link href="https://playarena.in/birthdays/">
+                    <h3 className="font-medium">Birthdays at PLaY</h3>
+                    <p className="text-sm text-gray-600">Celebrate Memorable Birthdays Here!</p>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://playarena.in/corporates-at-play/">
+                    <h3 className="font-medium">Corporate events</h3>
+                    <p className="text-sm text-gray-600">Dynamic events and experiences</p>
+                    </Link>
+                </div>
+                <div>
+                  <Link href="https://playarena.in/playdates/">
+                    <h3 className="font-medium">Perfect Dates at PLaY</h3>
+                    <p className="text-sm text-gray-600">Connecting with or without a reason to celebrate</p>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://playarena.in/enquiry/">
+                    <h3 className="font-medium">Plan your Event</h3>
+                    <p className="text-sm text-gray-600">Fill out a form to make an enquiry</p>
+                    </Link>
+                </div>
+              </div>
+            </NavItem><NavItem text="F&B" isMobile>
+  <div className="bg-black p-4 space-y-4">
+    <div>
+      <Link href="https://playarena.in/foodcourt/">
+        <h3 className="font-medium">Food Court</h3>
+        <p className="text-sm text-gray-600">
+          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest.
+        </p>
+        </Link>
+    </div>
+    <div>
+      <Link href="https://playarena.in/restaurant/restaurant-1/">
+        <h3 className="font-medium">Restaurant</h3>
+        <p className="text-sm text-gray-600">
+          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest that’s sure to satisfy your cravings.
+        </p>
+        </Link>
+    </div>
+  </div>
+</NavItem>
             <div className="flex flex-col gap-3 p-4 border-t border-gray-800">
-              <Link 
-                href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" 
-                className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-                aria-label="Contact us on WhatsApp"
-              >
-                <Phone className="w-5 h-5" aria-hidden="true" />
+              <Link href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md">
+                <Phone className="w-5 h-5" />
                 <span>Contact Us</span>
               </Link>
-              <Link 
-                href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/" 
-                className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-                aria-label="Find our location on Google Maps"
-              >
-                <MapPin className="w-5 h-5" aria-hidden="true" />
+              <Link href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/data=!3m2!1%5B%E2%80%A6%5D1!16s%2Fg%2F124yf6tmx?entry=tts&g_ep=EgoyMDI0MDgyNi4wKgBIAVAD"  className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md">
+                <MapPin className="w-5 h-5" />
                 <span>Find Location</span>
               </Link>
             </div>
@@ -402,40 +421,5 @@ const Navbar = () => {
     </nav>
   );
 };
-
-// Helper components
-interface NavLinkProps {
-  href: string;
-  title: string;
-  description: string;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ href, title, description }) => (
-  <Link 
-    href={href}
-    className="block hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-    role="menuitem"
-  >
-    <h3 className="font-medium text-black">{title}</h3>
-    <p className="text-sm text-gray-600">{description}</p>
-  </Link>
-);
-
-interface MobileNavLinkProps {
-  href: string;
-  title: string;
-  description: string;
-}
-
-const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, title, description }) => (
-  <Link 
-    href={href}
-    className="block hover:bg-gray-700 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-    role="menuitem"
-  >
-    <h3 className="text-white font-medium">{title}</h3>
-    <p className="text-sm text-gray-400">{description}</p>
-  </Link>
-);
 
 export default Navbar;
