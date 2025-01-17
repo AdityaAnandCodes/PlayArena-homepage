@@ -55,7 +55,7 @@ const Footer = () => {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600"
+              className="absolute right-3 top-4 text-blue-600"
             >
               <Send className="w-5 h-5" />
             </motion.button>
