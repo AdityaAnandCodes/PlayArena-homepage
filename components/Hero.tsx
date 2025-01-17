@@ -85,9 +85,15 @@ const VideoCard: React.FC<VideoCardProps> = ({
         </span>
       </div>
       
-      <div className={`absolute left-0 right-0 bottom-24 mx-4 transition-all duration-300 ${
-        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-      }`}>
+      <div 
+        id={`tabpanel-${id}-mobile`}
+        role="tabpanel"
+        aria-labelledby={`tab-${id}-mobile`}
+        className={`absolute left-0 right-0 bottom-24 mx-4 transition-all duration-300 ${
+          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+        }`}
+        tabIndex={0}
+      >
         <div className={`${bgColor} rounded-lg py-3 px-4`}>
           <h3 className="text-xl font-semibold text-black mb-[0.1px]">{title}</h3>
           <p className="text-black text-sm mb-1 font-semibold">{description}</p>
@@ -240,32 +246,36 @@ const HeroSection = () => {
       </div>
 
       {/* Cards Container */}
-      <div className="absolute bottom-0 w-full z-20">
-        {/* Mobile Interface */}
-        <div 
-          className="md:hidden w-full bg-black p-4 flex justify-between items-center"
-        >
-          {cards.map((card, index) => (
-            <div
-              key={card.id}
-              id={`tab-${card.id}`}
-              role="tab"
-              aria-selected={activeVideo === card.id}
-              aria-controls={`tabpanel-${card.id}`}
-              tabIndex={activeVideo === card.id ? 0 : -1}
-              onClick={() => setActiveVideo(card.id)}
-              onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
-              className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
-            >
-              <VideoCard 
-                {...card} 
-                isHovered={hoveredCard === card.id} 
-                isActive={activeVideo === card.id}
-                isMobile={true}
-              />
+       <div className="absolute bottom-0 w-full z-20">
+          {/* Modified Mobile Interface */}
+          <div 
+            className="md:hidden w-full bg-black p-4"
+            role="tablist"
+            aria-label="Activity categories"
+          >
+            <div className="flex justify-between items-center">
+              {cards.map((card) => (
+                <div
+                  key={card.id}
+                  id={`tab-${card.id}-mobile`}
+                  role="tab"
+                  aria-selected={activeVideo === card.id}
+                  aria-controls={`tabpanel-${card.id}-mobile`}
+                  tabIndex={activeVideo === card.id ? 0 : -1}
+                  onClick={() => setActiveVideo(card.id)}
+                  onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
+                  className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
+                >
+                  <VideoCard 
+                    {...card} 
+                    isHovered={hoveredCard === card.id} 
+                    isActive={activeVideo === card.id}
+                    isMobile={true}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
         {/* Desktop Interface */}
         <div className="hidden md:block">
