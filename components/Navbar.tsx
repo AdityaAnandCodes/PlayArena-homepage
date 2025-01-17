@@ -313,16 +313,22 @@ const Navbar = () => {
 </NavItem>
           </div>
 
-          {/* Contact Icons */}
-          <div className="hidden lg:flex gap-4">
-            <Link href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" className="text-white hover:text-gray-300 transition-colors">
-              <Phone className="w-6 h-6" />
-            </Link>
-            <Link href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/data=!3m2!1%5B%E2%80%A6%5D1!16s%2Fg%2F124yf6tmx?entry=tts&g_ep=EgoyMDI0MDgyNi4wKgBIAVAD" className="text-white hover:text-gray-300 transition-colors">
-              <MapPin className="w-6 h-6" />
-            </Link>
-          </div>
-
+         <div className="hidden lg:flex gap-4">
+  <Link 
+    href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" 
+    className="text-white hover:text-gray-300 transition-colors"
+    aria-label="Contact us on WhatsApp"
+  >
+    <Phone className="w-6 h-6" aria-hidden="true" />
+  </Link>
+  <Link 
+    href="https://www.google.com/maps/place/PLaY+Arena/@12.911395,77.6737242,1091m/data=!3m2!1%5B%E2%80%A6%5D1!16s%2Fg%2F124yf6tmx?entry=tts&g_ep=EgoyMDI0MDgyNi4wKgBIAVAD" 
+    className="text-white hover:text-gray-300 transition-colors"
+    aria-label="View PLaY Arena location on Google Maps"
+  >
+    <MapPin className="w-6 h-6" aria-hidden="true" />
+  </Link>
+</div>
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden text-white p-2"
