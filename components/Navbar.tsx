@@ -112,15 +112,13 @@ const PlayDropdown = ({ isMobile = false }) => {
     </div>
   );
 };
-
 const MobilePlayDropdown = () => {
-  const router = useRouter();
-
   return (
-    <div className="bg-white">
+    // Adding max-height and overflow-y-auto for scrolling
+    <div className="bg-white max-h-[60vh] overflow-y-auto">
       {playCategories.map((category) => (
         <div key={category.name}>
-          <div className={`${category.bgColor} px-4 py-3 flex items-center justify-between`}>
+          <div className={`${category.bgColor} px-4 py-3 flex items-center justify-between sticky top-0`}>
             <span className="font-medium">{category.name}</span>
             <div className="w-6 h-6">
               {category.icon}
@@ -140,49 +138,76 @@ const MobilePlayDropdown = () => {
     </div>
   );
 };
+import { ReactNode } from 'react';
 
 interface NavItemProps {
   text: string;
   dropdown?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   isMobile?: boolean;
   'aria-haspopup'?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ text, dropdown, children, isMobile = false, 'aria-haspopup': hasPopup }) => {
+const NavItem = ({ text, dropdown = false, children = null, isMobile = false, 'aria-haspopup': hasPopup }: NavItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      setIsOpen(!isOpen);
-      e.preventDefault();
-    } else if (e.key === 'Escape') {
-      setIsOpen(false);
+  interface RenderMenuItemProps {
+    child: React.ReactNode;
+  }
+
+  const renderMenuItem = ({ child }: RenderMenuItemProps): React.ReactNode => {
+    if (!React.isValidElement(child)) return child;
+
+    // Handle Link components
+    if (child.type === Link) {
+      return React.cloneElement(child  as React.ReactElement<any>, {
+        ...(typeof child.props === 'object' ? child.props : {}),
+        className: `block transition-colors ${(child.props as React.HTMLAttributes<HTMLElement>).className || ''}`
+      });
     }
+
+    // Handle heading (h3) and paragraph (p) elements
+    const updatedChildren = React.Children.map((child.props as React.PropsWithChildren<any>).children, (grandChild) => {
+      if (!React.isValidElement(grandChild)) return grandChild;
+
+      if (grandChild.type === 'h3') {
+        return React.cloneElement(grandChild as React.ReactElement<any>, {
+          className: 'text-white font-medium mb-1',
+          ...(typeof grandChild.props === 'object' ? grandChild.props : {})
+        });
+      }
+
+      if (grandChild.type === 'p') {
+        return React.cloneElement(grandChild  as React.ReactElement<any>, {
+          className: 'text-gray-400 text-sm',
+          ...(typeof grandChild.props === 'object' ? grandChild.props : {})
+        });
+      }
+
+      return grandChild;
+    });
+
+    return React.cloneElement(child, {
+      ...(typeof child.props === 'object' ? child.props : {}),
+      ...(child.props as any),
+      children: updatedChildren as React.ReactNode
+    });
   };
-  
+
   return (
-    <div 
-      className="relative"
-      onMouseEnter={() => !isMobile && setIsOpen(true)}
-      onMouseLeave={() => !isMobile && !isFocused && setIsOpen(false)}
-      role="none"
-    >
+    <div className="relative">
       <button
         className={`
           flex items-center gap-2 cursor-pointer py-2 px-4
-          focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
-          rounded-md ${isMobile ? 'w-full text-left' : ''}
+          focus:outline-none
+          rounded-md
+          ${isMobile ? 'w-full text-left' : ''}
+          hover:bg-gray-800/50 transition-colors
         `}
         onClick={() => setIsOpen(!isOpen)}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
         aria-expanded={isOpen}
         aria-haspopup={hasPopup}
         aria-controls={`${text.toLowerCase()}-menu`}
-        aria-label={`${text} navigation section`}
       >
         <span className="text-white">{text}</span>
         {hasPopup && (
@@ -192,24 +217,36 @@ const NavItem: React.FC<NavItemProps> = ({ text, dropdown, children, isMobile = 
           />
         )}
       </button>
+
       {isOpen && (
         <div
           id={`${text.toLowerCase()}-menu`}
-          className={isMobile ? 'w-full' : 'absolute top-full left-0'}
-          role="menu"
-          aria-label={`${text} submenu`}
+          className={`
+            ${isMobile ? 'w-full' : 'absolute top-full left-0'}
+            z-50
+          `}
         >
           {dropdown ? (
-            isMobile ? <MobilePlayDropdown /> : <PlayDropdown />
+            isMobile ? (
+              <div className="max-h-[60vh] overflow-y-auto">
+                <MobilePlayDropdown />
+              </div>
+            ) : (
+              <PlayDropdown />
+            )
           ) : (
-            children
+            <div className={`
+              bg-black p-4 space-y-4
+              ${!isMobile && 'shadow-lg min-w-[256px]'}
+            `}>
+              {React.Children.map(children, (child) => child && renderMenuItem({ child }))}
+            </div>
           )}
         </div>
       )}
     </div>
   );
 };
-
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -358,8 +395,8 @@ const Navbar = () => {
                 </div>
                 <div>
                   <Link href="https://playarena.in/event/">
-                    <h3 className="font-medium">Events at PLaY</h3>
-                    <p className="text-sm text-gray-600">Join the community to celebrate special moments. Screenings...</p>
+                    <h3 className="text-white font-medium">Events at PLaY</h3>
+                    <p className="text-sm text-gray-400">Join the community to celebrate special moments. Screenings...</p>
                     </Link>
                 </div>
               </div>
@@ -368,49 +405,50 @@ const Navbar = () => {
               <div className="bg-black p-4 space-y-4">
                 <div>
                   <Link href="https://playarena.in/birthdays/">
-                    <h3 className="font-medium">Birthdays at PLaY</h3>
-                    <p className="text-sm text-gray-600">Celebrate Memorable Birthdays Here!</p>
+                    <h3 className="text-white font-medium">Birthdays at PLaY</h3>
+                    <p className="text-sm text-gray-400">Celebrate Memorable Birthdays Here!</p>
                   </Link>
                 </div>
                 <div>
                   <Link href="https://playarena.in/corporates-at-play/">
-                    <h3 className="font-medium">Corporate events</h3>
-                    <p className="text-sm text-gray-600">Dynamic events and experiences</p>
+                    <h3 className="text-white font-medium">Corporate events</h3>
+                    <p className="text-sm text-gray-400">Dynamic events and experiences</p>
                     </Link>
                 </div>
                 <div>
                   <Link href="https://playarena.in/playdates/">
-                    <h3 className="font-medium">Perfect Dates at PLaY</h3>
-                    <p className="text-sm text-gray-600">Connecting with or without a reason to celebrate</p>
+                    <h3 className="text-white font-medium">Perfect Dates at PLaY</h3>
+                    <p className="text-sm text-gray-400">Connecting with or without a reason to celebrate</p>
                   </Link>
                 </div>
                 <div>
                   <Link href="https://playarena.in/enquiry/">
-                    <h3 className="font-medium">Plan your Event</h3>
-                    <p className="text-sm text-gray-600">Fill out a form to make an enquiry</p>
+                    <h3 className="text-white font-medium">Plan your Event</h3>
+                    <p className="text-sm text-gray-400">Fill out a form to make an enquiry</p>
                     </Link>
                 </div>
               </div>
-            </NavItem><NavItem text="F&B" isMobile>
-  <div className="bg-black p-4 space-y-4">
-    <div>
-      <Link href="https://playarena.in/foodcourt/">
-        <h3 className="font-medium">Food Court</h3>
-        <p className="text-sm text-gray-600">
-          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest.
-        </p>
-        </Link>
-    </div>
-    <div>
-      <Link href="https://playarena.in/restaurant/restaurant-1/">
-        <h3 className="font-medium">Restaurant</h3>
-        <p className="text-sm text-gray-600">
-          From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest that’s sure to satisfy your cravings.
-        </p>
-        </Link>
-    </div>
-  </div>
-</NavItem>
+            </NavItem>
+            <NavItem text="F&B" isMobile>
+              <div className="bg-black p-4 space-y-4">
+                <div>
+                  <Link href="https://playarena.in/foodcourt/">
+                    <h3 className="text-white font-medium">Food Court</h3>
+                    <p className="text-sm text-gray-400">
+                      From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest.
+                    </p>
+                    </Link>
+                </div>
+                <div>
+                  <Link href="https://playarena.in/restaurant/restaurant-1/">
+                    <h3 className="text-white font-medium">Restaurant</h3>
+                    <p className="text-sm text-gray-400">
+                      From tasty continental bites to refreshing sips, dive into a fun-filled flavor fest that's sure to satisfy your cravings.
+                    </p>
+                    </Link>
+                </div>
+              </div>
+            </NavItem>
             <div className="flex flex-col gap-3 p-4 border-t border-gray-800">
               <Link href="https://api.whatsapp.com/send/?phone=919900099922&text&type=phone_number&app_absent=0" className="flex items-center gap-2 text-white hover:bg-gray-800 p-2 rounded-md">
                 <Phone className="w-5 h-5" />
