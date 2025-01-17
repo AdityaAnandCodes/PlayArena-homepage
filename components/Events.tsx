@@ -2,15 +2,17 @@
 import { Cake, Briefcase, Heart, ArrowRight, PartyPopper, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface EventCardProps {
   title: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   description: string;
   imageUrl: string;
+  link : string;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ title, icon: Icon, description, imageUrl }) => {
+const EventCard: React.FC<EventCardProps> = ({ title, icon: Icon, description, imageUrl , link }) => {
   return (
     <motion.div
       className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -42,13 +44,13 @@ const EventCard: React.FC<EventCardProps> = ({ title, icon: Icon, description, i
 
         <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{description}</p>
 
-        <button
+        <Link href={link}
           className="group flex items-center gap-2 text-teal-600 font-semibold transition-all"
           aria-label={`Find out more about ${title}`}
         >
           <span>Find out more</span>
           <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-        </button>
+        </Link>
       </div>
     </motion.div>
   );
@@ -61,6 +63,7 @@ const events = [
     description:
       'Thrilling activities, exciting games, and delicious food—our custom packages ensure unforgettable experiences for all ages!',
     imageUrl: '/Images/BirthdayBash.jpg',
+    link : "https://playarena.in/birthdays/"
   },
   {
     title: 'Corporate Events',
@@ -68,6 +71,7 @@ const events = [
     description:
       'Nothing like a game to get the teamwork going. Talk to us to find out more about our corporate packages for offsites, team building activities, leadership meets, outbound learning and more.',
     imageUrl: '/Images/CorporateEvents.jpg',
+    link : "https://playarena.in/corporates-at-play/",
   },
   {
     title: 'Play Dates',
@@ -75,6 +79,7 @@ const events = [
     description:
       'Experience Play Dates, any day of the week, enjoy this special offer and quality time with your partner. Perfect for fun and connection!',
     imageUrl: '/Images/PlayDate.jpg',
+    link : "https://playarena.in/playdates/",
   },
 ];
 
@@ -118,14 +123,15 @@ const EventsSection = () => {
           className="text-center px-4" 
           whileHover={{ scale: 1.02 }}
         >
-          <a
-            href="#custom"
+          <Link
+            href="https://playarena.in/enquiry/"
             className="inline-flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-semibold text-black hover:text-black/90 transition-colors"
           >
             <PartyPopper className="w-10 h-10 sm:w-6 sm:h-6 " />
+            
             <span className="text-center">Have an offbeat idea? Create your own event!</span>
             <ArrowRight className="w-10 h-10 sm:w-6 sm:h-6" />
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

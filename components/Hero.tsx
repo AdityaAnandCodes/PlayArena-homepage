@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { PrimeSvg, StudioSvg, UnionSvg, JuniorSvg, PixelSvg } from './IconComponents'
+import Link from 'next/link';
 
 interface VideoCardProps {
   title: string;
@@ -10,6 +11,7 @@ interface VideoCardProps {
   isHovered: boolean;
   isActive: boolean;
   id: string;
+  link : string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ 
@@ -19,7 +21,9 @@ const VideoCard: React.FC<VideoCardProps> = ({
   bgColor, 
   isHovered,
   isActive,
-  id 
+  link,
+  id,
+  
 }) => {
   // Desktop view
   const DesktopCard = () => (
@@ -44,7 +48,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
               isHovered || isActive ? 'opacity-100 max-h-40' : 'opacity-0 max-h-0 overflow-hidden'
             }`}>
               <p className="text-black text-xs md:text-sm my-2 md:my-4 font-semibold">{description}</p>
-              <button className="bg-blue-500 text-white px-4 md:px-6 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-600 transition-colors text-xs md:text-base">
+              <Link href={link} className="bg-blue-500 text-white px-4 md:px-6 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-600 transition-colors text-xs md:text-base">
                 View All Activities
                 <svg
                   className="w-3 h-3 md:w-4 md:h-4"
@@ -59,7 +63,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -85,7 +89,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
         <div className={`${bgColor} rounded-lg py-3 px-4`}>
           <h2 className="text-xl font-semibold text-black mb-[0.1px]">{title}</h2>
           <p className="text-black text-sm mb-1 font-semibold">{description}</p>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-600 transition-colors text-sm">
+          <Link href={link} className="bg-blue-500 text-white px-4 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-600 transition-colors text-sm">
             View All Activities
             <svg
               className="w-3 h-3"
@@ -100,7 +104,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
                 d="M9 5l7 7-7 7"
               />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -127,7 +131,8 @@ const HeroSection = () => {
       description: 'Strategy and action sports for the squad',
       icon: PrimeSvg,
       videoUrl: '/Videos/prime-10sec.mp4',
-      bgColor: 'bg-[#E7FF97]'
+      bgColor: 'bg-[#E7FF97]',
+      link : "https://playarena.in/activity/bowling/"
     },
     {
       id: 'studio',
@@ -135,7 +140,8 @@ const HeroSection = () => {
       description: 'Short format, big thrills served a la carte',
       icon: StudioSvg,
       videoUrl: '/Videos/studio-10sec-1.mp4',
-      bgColor: 'bg-[#E9E9E9]'
+      bgColor: 'bg-[#E9E9E9]',
+      link  : "https://playarena.in/activity/bumper-cars-2/"
     },
     {
       id: 'union',
@@ -143,7 +149,8 @@ const HeroSection = () => {
       description: 'Classic favourites for the recreational sport',
       icon: UnionSvg,
       videoUrl: '/Videos/union-10sec.mp4',
-      bgColor: 'bg-[#C1EBFF]'
+      bgColor: 'bg-[#C1EBFF]',
+      link : "https://playarena.in/activity/swimming-pool/"
     },
     {
       id: 'junior',
@@ -151,7 +158,8 @@ const HeroSection = () => {
       description: 'Toddler-sized fun for little champs',
       icon: JuniorSvg,
       videoUrl: '/Videos/junior-10sec.mp4',
-      bgColor: 'bg-[#DCFFE7]'
+      bgColor: 'bg-[#DCFFE7]',
+      link : "https://playarena.in/activity/little-gym/"
     },
     {
       id: 'pixel',
@@ -159,7 +167,8 @@ const HeroSection = () => {
       description: "Shoot, race and more in the gamer's den",
       icon: PixelSvg,
       videoUrl: '/Videos/pixel-10sec-2.mp4',
-      bgColor: 'bg-[#E7FFF4]'
+      bgColor: 'bg-[#E7FFF4]',
+      link : "https://playarena.in/activity/vr-coaster/"
     }
   ];
 
