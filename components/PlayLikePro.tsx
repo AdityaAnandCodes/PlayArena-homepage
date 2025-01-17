@@ -3,8 +3,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const PlayLikeProSection = () => {
+  const router = useRouter();
+  const handleMember = (() =>{
+    router.push('/#Hero')
+  })
   const features = [
     {
       title: "SKIP THE QUEUE",
@@ -114,7 +119,8 @@ const PlayLikeProSection = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-blue-600 text-white px-6 py-3 rounded-full font-medium inline-flex items-center gap-2 shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-6 py-3 rounded-full font-medium inline-flex items-center gap-2 shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors" 
+              onClick={handleMember}
             >
               Become a member
               <ArrowRight className="w-4 h-4" />

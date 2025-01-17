@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import Link from "next/link";
 
 interface Event {
   id: string;
@@ -128,9 +129,9 @@ export default function SpecialsSlider({ events, autoPlayInterval = 3000 }: Spec
                         </p>
                       )}
                       <div className="flex-grow" />
-                      <button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white w-full px-4 py-2.5 rounded-lg hover:from-violet-700 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-sm sm:text-base font-medium">
+                      <Link href="www.google.com" className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white w-full px-4 py-2.5 rounded-lg hover:from-violet-700 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-sm sm:text-base font-medium">
                         {event.buttonText || "Book Now"}
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>

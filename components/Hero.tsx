@@ -194,7 +194,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+    <section id="Hero" ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
       {/* Video Container */}
       <div className="absolute inset-0">
         {cards.map((card) => (
@@ -255,7 +255,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

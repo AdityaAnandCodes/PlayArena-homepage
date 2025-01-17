@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Instagram, Youtube, Linkedin, Facebook } from 'lucide-react';
+import Link from 'next/link';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -109,12 +110,12 @@ const Footer = () => {
                     whileHover={{ x: 5 }}
                     className="text-sm"
                   >
-                    <a 
+                    <Link 
                       href="#" 
                       className={`${link.includes('@') || link.includes('99') ? 'text-blue-400' : 'text-gray-400'} hover:text-blue-400 transition-colors`}
                     >
                       {link}
-                    </a>
+                    </Link>
                   </motion.li>
                 ))}
               </ul>
@@ -142,3 +143,11 @@ const Footer = () => {
 };
 
 export default Footer;
+
+/* primelink : "https://playarena.in/activity/bowling/"
+studio link  : "https://playarena.in/activity/bumper-cars-2/"
+union link : "https://playarena.in/activity/swimming-pool/"
+junior link : "https://playarena.in/activity/little-gym/"
+pixel link : "https://playarena.in/activity/vr-coaster/"
+
+*/
