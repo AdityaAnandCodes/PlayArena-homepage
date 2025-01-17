@@ -36,7 +36,7 @@ const VideoCard: React.FC<VideoCardProps> = ({
           
           <div className="absolute top-0 w-full p-3 md:p-6">
             <div className="flex items-center gap-2 md:gap-4">
-              <span className="text-current scale-75 md:scale-100" aria-hidden="true">
+              <span className="text-current scale-75 md:scale-100 px-1" aria-hidden="true">
                 <Icon />
               </span>
               <h3 className="text-lg md:text-3xl font-semibold text-black">{title}</h3>
