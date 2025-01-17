@@ -9,7 +9,7 @@ import SpecialsSlider from '@/components/SpecialsSlider';
 
 const demoEvents = [
   {
-    id: 1,
+    id: '1',
     title: 'Magic of Christmas With Jayant',
     date: '21st December',
     time: '7:30 PM Onwards',
@@ -17,7 +17,7 @@ const demoEvents = [
     buttonText: 'BOOK NOW!'
   },
   {
-    id: 2,
+    id: '2',
     title: 'Christmas Cake Mixing Ceremony',
     date: '8th December',
     time: '5 PM to 6 PM',
@@ -26,7 +26,7 @@ const demoEvents = [
     buttonText: 'JOIN NOW!'
   },
   {
-    id: 3,
+    id: '3',
     title: 'Santa’s Workshop for Kids',
     date: '15th December',
     time: '10 AM to 1 PM',
@@ -35,7 +35,7 @@ const demoEvents = [
     buttonText: 'REGISTER NOW!'
   },
   {
-    id: 4,
+    id: '4',
     title: 'Christmas Eve Caroling Night',
     date: '24th December',
     time: '6 PM to 9 PM',
@@ -44,7 +44,7 @@ const demoEvents = [
     buttonText: 'JOIN US!'
   },
   {
-    id: 5,
+    id: '5',
     title: 'New Year Countdown Gala',
     date: '31st December',
     time: '8 PM Onwards',
