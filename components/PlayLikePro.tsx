@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 const PlayLikeProSection = () => {
   const router = useRouter();
   const handleMember = (() =>{
-    router.push('/#Hero')
+    router.push('/#hero-section')
   })
   const features = [
     {

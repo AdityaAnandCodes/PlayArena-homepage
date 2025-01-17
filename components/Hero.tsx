@@ -12,6 +12,7 @@ interface VideoCardProps {
   isActive: boolean;
   id: string;
   link : string;
+  isMobile: boolean;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ 
@@ -123,6 +124,17 @@ const HeroSection = () => {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  interface HandleKeyNavigationProps {
+    event: React.KeyboardEvent<HTMLDivElement>;
+    cardId: string;
+  }
+
+  const handleKeyNavigation = ({ event, cardId }: HandleKeyNavigationProps) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setActiveVideo(cardId);
+    }
+  };
 
   const cards = [
     {
@@ -194,67 +206,116 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section id="Hero" ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+    
+    <section 
+      id="hero-section" 
+      ref={containerRef} 
+      className="relative w-full h-screen overflow-hidden bg-black"
+      aria-label="Featured content carousel"
+      role="region"
+    >
       {/* Video Container */}
-      <div className="absolute inset-0">
+      <div 
+        className="absolute inset-0"
+        aria-hidden="true" // Videos are decorative, content is in cards
+      >
         {cards.map((card) => (
           <video
             key={card.id}
             ref={el => { videoRefs.current[card.id] = el; }}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700
               ${activeVideo === card.id ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-            autoPlay
+            autoPlay={activeVideo === card.id}
             muted
             loop
             playsInline
+            aria-hidden="true"
+            preload="metadata"
           >
             <source src={card.videoUrl} type="video/mp4" />
+            <track 
+              kind="descriptions" 
+              label="Description" 
+            />
           </video>
         ))}
       </div>
 
       {/* Cards Container */}
-      <div className="absolute bottom-0 w-full z-20">
-        {/* Mobile black panel */}
-        <div className="md:hidden w-full bg-black p-4 flex justify-between items-center">
+      <div 
+        className="absolute bottom-0 w-full z-20"
+        role="tablist"
+        aria-label="Content navigation"
+      >
+        {/* Mobile Interface */}
+        <div 
+          className="md:hidden w-full bg-black p-4 flex justify-between items-center"
+          role="tablist"
+          aria-label="Mobile content navigation"
+        >
           {cards.map((card) => (
             <div
               key={card.id}
-              className="cursor-pointer flex-1"
+              role="tab"
+              tabIndex={0}
+              aria-selected={activeVideo === card.id}
+              aria-controls={`video-${card.id}`}
+              className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
               onClick={() => setActiveVideo(card.id)}
+              onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
             >
               <VideoCard 
                 {...card} 
                 isHovered={hoveredCard === card.id} 
                 isActive={activeVideo === card.id}
+                isMobile={true}
               />
             </div>
           ))}
         </div>
 
-        {/* Desktop cards */}
-        <div className="hidden md:block">
+        {/* Desktop Interface */}
+        <div 
+          className="hidden md:block"
+          role="tablist"
+          aria-label="Desktop content navigation"
+        >
           <div className="grid grid-cols-5 gap-0">
             {cards.map((card) => (
               <div
                 key={card.id}
-                className="relative cursor-pointer"
+                role="tab"
+                tabIndex={0}
+                aria-selected={activeVideo === card.id}
+                aria-controls={`video-${card.id}`}
+                className="relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
                 onMouseEnter={() => {
                   setActiveVideo(card.id);
                   setHoveredCard(card.id);
                 }}
                 onMouseLeave={() => setHoveredCard(null)}
+                onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
+                onFocus={() => setActiveVideo(card.id)}
               >
                 <VideoCard 
                   {...card} 
                   isHovered={hoveredCard === card.id} 
                   isActive={activeVideo === card.id}
+                  isMobile={false}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Skip Navigation */}
+      <button
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-black text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+        onClick={() => document.getElementById('main-content')?.focus()}
+      >
+        Skip to main content
+      </button>
     </section>
   );
 };

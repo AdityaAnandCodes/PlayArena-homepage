@@ -85,52 +85,94 @@ const events = [
 
 const EventsSection = () => {
   return (
-    <section className="bg-gradient-to-b from-[#fefae0] to-white py-12 sm:py-16 md:py-20">
+     <section 
+      className="bg-gradient-to-b from-[#fefae0] to-white py-12 sm:py-16 md:py-20"
+      aria-labelledby="events-section-title"
+    >
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-16">
+        {/* Header Section */}
+        <div 
+          className="max-w-3xl mx-auto text-center mb-10 sm:mb-16"
+          role="region"
+          aria-labelledby="events-section-title"
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 text-black">
+            <h1 
+              id="events-section-title"
+              className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 text-black"
+            >
               Play, Your Way
-              <span className="inline-block ml-2 sm:ml-3">
-                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
+              <span 
+                className="inline-block ml-2 sm:ml-3"
+                aria-hidden="true"
+              >
+                <Sparkles 
+                  className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" 
+                  role="img"
+                  aria-label="sparkles"
+                />
               </span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 px-4">
+            <p 
+              className="text-base sm:text-lg text-gray-600 px-4"
+              role="contentinfo"
+            >
               When it comes to get-togethers, the more is always the merrier. You bring the people, we&apos;ll take care of the rest. Call us for customized birthdays, farewells, anniversaries and other events or group packages with entertainment, music and a fantastic range of F&amp;B to choose from.
             </p>
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-16">
+        {/* Events Grid */}
+        <div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-16"
+          role="list"
+          aria-label="Available events"
+        >
           {events.map((event, index) => (
             <motion.div
               key={event.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ 
+                delay: index * 0.1,
+                duration: 0.5
+              }}
+              role="listitem"
             >
               <EventCard {...event} />
             </motion.div>
           ))}
         </div>
 
+        {/* Call to Action */}
         <motion.div 
           className="text-center px-4" 
           whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
         >
           <Link
             href="https://playarena.in/enquiry/"
-            className="inline-flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-semibold text-black hover:text-black/90 transition-colors"
+            className="inline-flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-semibold text-black 
+                     hover:text-black/90 transition-colors p-4 rounded-lg
+                     focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+            aria-label="Create your own custom event - Opens in a new tab"
+            rel="noopener noreferrer"
           >
-            <PartyPopper className="w-10 h-10 sm:w-6 sm:h-6 " />
-            
+            <PartyPopper 
+              className="w-10 h-10 sm:w-6 sm:h-6"
+              aria-hidden="true"
+            />
             <span className="text-center">Have an offbeat idea? Create your own event!</span>
-            <ArrowRight className="w-10 h-10 sm:w-6 sm:h-6" />
+            <ArrowRight 
+              className="w-10 h-10 sm:w-6 sm:h-6"
+              aria-hidden="true"
+            />
           </Link>
         </motion.div>
       </div>
