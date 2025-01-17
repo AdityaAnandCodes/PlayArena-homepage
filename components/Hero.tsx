@@ -11,8 +11,7 @@ interface VideoCardProps {
   isHovered: boolean;
   isActive: boolean;
   id: string;
-  link: string;
-  isMobile: boolean;
+  link : string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ 
@@ -23,7 +22,8 @@ const VideoCard: React.FC<VideoCardProps> = ({
   isHovered,
   isActive,
   link,
-  id
+  id,
+  
 }) => {
   // Desktop view
   const DesktopCard = () => (
@@ -137,18 +137,6 @@ const HeroSection = () => {
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
-  interface HandleKeyNavigationProps {
-    event: React.KeyboardEvent<HTMLDivElement>;
-    cardId: string;
-  }
-
-  const handleKeyNavigation = ({ event, cardId }: HandleKeyNavigationProps) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      setActiveVideo(cardId);
-    }
-  };
-
   const cards = [
     {
       id: 'prime',
@@ -157,7 +145,7 @@ const HeroSection = () => {
       icon: PrimeSvg,
       videoUrl: '/Videos/prime-10sec.mp4',
       bgColor: 'bg-[#E7FF97]',
-      link: "https://playarena.in/activity/bowling/"
+      link : "https://playarena.in/activity/bowling/"
     },
     {
       id: 'studio',
@@ -166,7 +154,7 @@ const HeroSection = () => {
       icon: StudioSvg,
       videoUrl: '/Videos/studio-10sec-1.mp4',
       bgColor: 'bg-[#E9E9E9]',
-      link: "https://playarena.in/activity/bumper-cars-2/"
+      link  : "https://playarena.in/activity/bumper-cars-2/"
     },
     {
       id: 'union',
@@ -175,7 +163,7 @@ const HeroSection = () => {
       icon: UnionSvg,
       videoUrl: '/Videos/union-10sec.mp4',
       bgColor: 'bg-[#C1EBFF]',
-      link: "https://playarena.in/activity/swimming-pool/"
+      link : "https://playarena.in/activity/swimming-pool/"
     },
     {
       id: 'junior',
@@ -184,7 +172,7 @@ const HeroSection = () => {
       icon: JuniorSvg,
       videoUrl: '/Videos/junior-10sec.mp4',
       bgColor: 'bg-[#DCFFE7]',
-      link: "https://playarena.in/activity/little-gym/"
+      link : "https://playarena.in/activity/little-gym/"
     },
     {
       id: 'pixel',
@@ -193,7 +181,7 @@ const HeroSection = () => {
       icon: PixelSvg,
       videoUrl: '/Videos/pixel-10sec-2.mp4',
       bgColor: 'bg-[#E7FFF4]',
-      link: "https://playarena.in/activity/vr-coaster/"
+      link : "https://playarena.in/activity/vr-coaster/"
     }
   ];
 
@@ -219,13 +207,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-     <div className="relative">
-    <h1 className="sr-only">Play Arena Activities</h1>
-    <section 
-      ref={containerRef} 
-      className="relative w-full h-screen overflow-hidden bg-black"
-      aria-label="Featured activities showcase"
-    >
+    <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
       {/* Video Container */}
       <div className="absolute inset-0">
         {cards.map((card) => (
@@ -234,11 +216,10 @@ const HeroSection = () => {
             ref={el => { videoRefs.current[card.id] = el; }}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700
               ${activeVideo === card.id ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-            autoPlay={activeVideo === card.id}
+            autoPlay
             muted
             loop
             playsInline
-            aria-hidden="true"
           >
             <source src={card.videoUrl} type="video/mp4" />
           </video>
@@ -246,94 +227,48 @@ const HeroSection = () => {
       </div>
 
       {/* Cards Container */}
-       <div className="absolute bottom-0 w-full z-20">
-          {/* Modified Mobile Interface */}
-          <div 
-            className="md:hidden w-full bg-black p-4"
-            role="tablist"
-            aria-label="Activity categories"
-          >
-            <div className="flex justify-between items-center">
-              {cards.map((card) => (
-                <div
-                  key={card.id}
-                  id={`tab-${card.id}-mobile`}
-                  role="tab"
-                  aria-selected={activeVideo === card.id}
-                  aria-controls={`tabpanel-${card.id}-mobile`}
-                  tabIndex={activeVideo === card.id ? 0 : -1}
-                  onClick={() => setActiveVideo(card.id)}
-                  onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
-                  className="cursor-pointer flex-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black rounded-md"
-                >
-                  <VideoCard 
-                    {...card} 
-                    isHovered={hoveredCard === card.id} 
-                    isActive={activeVideo === card.id}
-                    isMobile={true}
-                  />
-                </div>
-              ))}
+      <div className="absolute bottom-0 w-full z-20">
+        {/* Mobile black panel */}
+        <div className="md:hidden w-full bg-black p-4 flex justify-between items-center">
+          {cards.map((card) => (
+            <div
+              key={card.id}
+              className="cursor-pointer flex-1"
+              onClick={() => setActiveVideo(card.id)}
+            >
+              <VideoCard 
+                {...card} 
+                isHovered={hoveredCard === card.id} 
+                isActive={activeVideo === card.id}
+              />
             </div>
-          </div>
+          ))}
+        </div>
 
-        {/* Desktop Interface */}
+        {/* Desktop cards */}
         <div className="hidden md:block">
-          <div 
-            role="tablist"
-            aria-label="Activity categories"
-            className="grid grid-cols-5 gap-0"
-          >
-            {cards.map((card, index) => (
+          <div className="grid grid-cols-5 gap-0">
+            {cards.map((card) => (
               <div
                 key={card.id}
-                id={`tab-${card.id}`}
-                role="tab"
-                aria-selected={activeVideo === card.id}
-                aria-controls={`tabpanel-${card.id}`}
-                tabIndex={activeVideo === card.id ? 0 : -1}
-                className="relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                className="relative cursor-pointer"
                 onMouseEnter={() => {
                   setActiveVideo(card.id);
                   setHoveredCard(card.id);
                 }}
                 onMouseLeave={() => setHoveredCard(null)}
-                onKeyDown={(e) => handleKeyNavigation({ event: e, cardId: card.id })}
-                onFocus={() => setActiveVideo(card.id)}
               >
                 <VideoCard 
                   {...card} 
                   isHovered={hoveredCard === card.id} 
                   isActive={activeVideo === card.id}
-                  isMobile={false}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Tab Panels */}
-      {cards.map((card) => (
-        <div
-          key={card.id}
-          id={`tabpanel-${card.id}`}
-          role="tabpanel"
-          aria-labelledby={`tab-${card.id}`}
-          className="sr-only"
-        >
-          {card.description}
-        </div>
-      ))}
-
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-      >
-        Skip to main content
-      </a>
-    </section>
-  </div>
+    </div>
   );
 };
 
