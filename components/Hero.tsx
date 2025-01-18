@@ -1,7 +1,9 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PrimeSvg, StudioSvg, UnionSvg, JuniorSvg, PixelSvg } from './IconComponents'
 import Link from 'next/link';
+
 
 interface VideoCardProps {
   title: string;
@@ -11,7 +13,7 @@ interface VideoCardProps {
   isHovered: boolean;
   isActive: boolean;
   id: string;
-  link : string;
+  link: string;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ 
@@ -23,15 +25,46 @@ const VideoCard: React.FC<VideoCardProps> = ({
   isActive,
   link,
   id,
-  
 }) => {
+  const cardVariants = {
+    collapsed: { 
+      height: "5rem",
+      transition: { duration: 2.0, ease: "easeInOut" }
+    },
+    expanded: { 
+      height: "12rem",
+      transition: { duration: 0.4, ease: "easeInOut" }
+    }
+  };
+
+  const contentVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 20,
+      transition: { duration: 0.8, ease: "easeOut" }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut", delay: 0.1 }
+    },
+    exit: { 
+      opacity: 0, 
+      y: 20,
+      transition: { duration: 0.8, ease: "easeIn" }
+    }
+  };
+
   // Desktop view
   const DesktopCard = () => (
     <div className="relative h-20 md:h-28 hidden md:block">
-      <div className={`absolute bottom-0 w-full transition-all duration-300`}>
-        <div className={`relative w-full ${bgColor} ${
-          isHovered || isActive ? 'h-40 md:h-56 lg:h-48' : 'h-16 md:h-20'
-        } transition-all duration-300`}>
+      <div className="absolute bottom-0 w-full">
+        <motion.div 
+          className={`relative w-full ${bgColor}`}
+          variants={cardVariants}
+          initial="collapsed"
+          animate={isHovered || isActive ? "expanded" : "collapsed"}
+        >
           <div className="absolute inset-0" />
           
           <div className="absolute top-0 w-full p-3 md:p-6">
@@ -42,18 +75,91 @@ const VideoCard: React.FC<VideoCardProps> = ({
               <h3 className="text-lg md:text-3xl font-semibold text-black">{title}</h3>
             </div>
 
-            <div className={`transition-all duration-300 ${
-              isHovered || isActive ? 'opacity-100 max-h-40' : 'opacity-0 max-h-0 overflow-hidden'
-            }`}>
-              <p className="text-black text-xs md:text-sm my-2 md:my-4 font-semibold">{description}</p>
+            <AnimatePresence mode="wait">
+              {(isHovered || isActive) && (
+                <motion.div
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <p className="text-black text-xs md:text-sm my-2 md:my-4 font-semibold">{description}</p>
+                  <Link 
+                    href={link} 
+                    className="bg-blue-600 text-white px-4 md:px-6 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs md:text-base"
+                    aria-label={`View all activities for ${title}`}
+                  >
+                    View All Activities
+                    <svg
+                      className="w-3 h-3 md:w-4 md:h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+
+  // Mobile view
+  const MobileCard = () => (
+    <div className="md:hidden w-full p-2">
+      <motion.div 
+        className={`rounded-lg p-[5px] ${
+          isActive ? `${bgColor} bg-opacity-100` : 'bg-transparent'
+        }`}
+        animate={{
+          backgroundColor: isActive ? bgColor : 'transparent'
+        }}
+        transition={{
+          duration: 0.3
+        }}
+      >
+        <span className={`${isActive ? 'text-black' : 'text-white'} transition-colors duration-300 flex items-center justify-center`} aria-hidden="true">
+          <Icon />
+        </span>
+      </motion.div>
+      
+      <AnimatePresence>
+        {isActive && (
+          <motion.div 
+            id={`tabpanel-${id}-mobile`}
+            role="tabpanel"
+            aria-labelledby={`tab-${id}-mobile`}
+            className="absolute left-0 right-0 bottom-24 mx-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeOut"
+            }}
+            tabIndex={0}
+          >
+            <div className={`${bgColor} rounded-lg py-3 px-4`}>
+              <h3 className="text-xl font-semibold text-black mb-[0.1px]">{title}</h3>
+              <p className="text-black text-sm mb-1 font-semibold">{description}</p>
               <Link 
                 href={link} 
-                className="bg-blue-600 text-white px-4 md:px-6 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs md:text-base"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm"
                 aria-label={`View all activities for ${title}`}
               >
                 View All Activities
                 <svg
-                  className="w-3 h-3 md:w-4 md:h-4"
+                  className="w-3 h-3"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -68,58 +174,9 @@ const VideoCard: React.FC<VideoCardProps> = ({
                 </svg>
               </Link>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Mobile view
-  const MobileCard = () => (
-    <div className="md:hidden w-full p-2">
-      <div className={`transition-all duration-300 rounded-lg p-[5px] ${
-        isActive ? `${bgColor} bg-opacity-100` : 'bg-transparent'
-      }`}>
-        <span className={`${isActive ? 'text-black' : 'text-white'} transition-colors duration-300 flex items-center justify-center`} aria-hidden="true">
-          <Icon />
-        </span>
-      </div>
-      
-      <div 
-        id={`tabpanel-${id}-mobile`}
-        role="tabpanel"
-        aria-labelledby={`tab-${id}-mobile`}
-        className={`absolute left-0 right-0 bottom-24 mx-4 transition-all duration-300 ${
-          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-        }`}
-        tabIndex={0}
-      >
-        <div className={`${bgColor} rounded-lg py-3 px-4`}>
-          <h3 className="text-xl font-semibold text-black mb-[0.1px]">{title}</h3>
-          <p className="text-black text-sm mb-1 font-semibold">{description}</p>
-          <Link 
-            href={link} 
-            className="bg-blue-600 text-white px-4 py-2 rounded-md w-fit flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm"
-            aria-label={`View all activities for ${title}`}
-          >
-            View All Activities
-            <svg
-              className="w-3 h-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 

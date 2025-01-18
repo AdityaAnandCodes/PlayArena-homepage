@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import Logo from './Logo';
 import { Menu, X, Phone, MapPin, ChevronDown } from 'lucide-react';
 import { PrimeSvg, StudioSvg, UnionSvg, JuniorSvg, PixelSvg } from './IconComponents';
@@ -78,6 +78,7 @@ const playCategories = [
     }
 ];
 
+
 const PlayDropdown = ({ isMobile = false }) => {
   const router = useRouter();
 
@@ -112,9 +113,9 @@ const PlayDropdown = ({ isMobile = false }) => {
     </div>
   );
 };
+
 const MobilePlayDropdown = () => {
   return (
-    // Adding max-height and overflow-y-auto for scrolling
     <div className="bg-white max-h-[60vh] overflow-y-auto">
       {playCategories.map((category) => (
         <div key={category.name}>
@@ -138,7 +139,6 @@ const MobilePlayDropdown = () => {
     </div>
   );
 };
-import { ReactNode } from 'react';
 
 interface NavItemProps {
   text: string;
@@ -146,27 +146,34 @@ interface NavItemProps {
   children?: ReactNode;
   isMobile?: boolean;
   'aria-haspopup'?: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-const NavItem = ({ text, dropdown = false, children = null, isMobile = false, 'aria-haspopup': hasPopup }: NavItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const NavItem = ({ 
+  text, 
+  dropdown = false, 
+  children = null, 
+  isMobile = false, 
+  'aria-haspopup': hasPopup,
+  isOpen,
+  onToggle
+}: NavItemProps) => {
   interface RenderMenuItemProps {
     child: React.ReactNode;
   }
-
+  const [isHovered, setIsHovered] = useState(false);
+  const showDropdown = isOpen || (!isMobile && isHovered);
   const renderMenuItem = ({ child }: RenderMenuItemProps): React.ReactNode => {
     if (!React.isValidElement(child)) return child;
 
-    // Handle Link components
     if (child.type === Link) {
-      return React.cloneElement(child  as React.ReactElement<any>, {
+      return React.cloneElement(child as React.ReactElement<any>, {
         ...(typeof child.props === 'object' ? child.props : {}),
         className: `block transition-colors ${(child.props as React.HTMLAttributes<HTMLElement>).className || ''}`
       });
     }
 
-    // Handle heading (h3) and paragraph (p) elements
     const updatedChildren = React.Children.map((child.props as React.PropsWithChildren<any>).children, (grandChild) => {
       if (!React.isValidElement(grandChild)) return grandChild;
 
@@ -178,7 +185,7 @@ const NavItem = ({ text, dropdown = false, children = null, isMobile = false, 'a
       }
 
       if (grandChild.type === 'p') {
-        return React.cloneElement(grandChild  as React.ReactElement<any>, {
+        return React.cloneElement(grandChild as React.ReactElement<any>, {
           className: 'text-gray-400 text-sm',
           ...(typeof grandChild.props === 'object' ? grandChild.props : {})
         });
@@ -189,36 +196,40 @@ const NavItem = ({ text, dropdown = false, children = null, isMobile = false, 'a
 
     return React.cloneElement(child, {
       ...(typeof child.props === 'object' ? child.props : {}),
-      ...(child.props as any),
-      children: updatedChildren as React.ReactNode
+      ...(child.props as React.PropsWithChildren<any>),
+      children: updatedChildren
     });
   };
 
   return (
-    <div className="relative">
+    <div 
+      className="relative"
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
+    >
       <button
         className={`
           flex items-center gap-2 cursor-pointer py-2 px-4
           focus:outline-none
           rounded-md
           ${isMobile ? 'w-full text-left' : ''}
-          hover:bg-gray-800/50 transition-colors
+          hover:bg-gray-800/50 transition-colors group
         `}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
+        onClick={onToggle}
+        aria-expanded={showDropdown}
         aria-haspopup={hasPopup}
         aria-controls={`${text.toLowerCase()}-menu`}
       >
-        <span className="text-white">{text}</span>
+        <span className="text-white group-hover:text-blue-400 transition-colors">{text}</span>
         {hasPopup && (
           <ChevronDown 
-            className={`w-4 h-4 text-white transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-white group-hover:text-blue-400 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`}
             aria-hidden="true"
           />
         )}
       </button>
 
-      {isOpen && (
+      {showDropdown && (
         <div
           id={`${text.toLowerCase()}-menu`}
           className={`
@@ -250,6 +261,8 @@ const NavItem = ({ text, dropdown = false, children = null, isMobile = false, 'a
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -261,24 +274,39 @@ const Navbar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  const [isOpen, setIsOpen] = useState(false);
+
+  const handleDropdownToggle = (dropdownName: string) => {
+    setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
+  };
 
   return (
     <nav role="navigation"
-      aria-label="Main navigation" className={`
-      fixed top-0 left-0 right-0 z-50
-      transition-all duration-300
-      ${isScrolled ? 'bg-black shadow-lg' : 'bg-black bg-opacity-95'}
-    `}>
+      aria-label="Main navigation" 
+      className={`
+        fixed top-0 left-0 right-0 z-50
+        transition-all duration-300
+        ${isScrolled ? 'bg-black shadow-lg' : 'bg-black bg-opacity-95'}
+      `}
+    >
       <div className="max-w-7xl mx-auto">
-        {/* ... (rest of the navbar structure remains the same) */}
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
           <Logo />
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex gap-6 items-center">
-            <NavItem text="Play" dropdown aria-haspopup={true} />
-            <NavItem text="Participate" aria-haspopup={true}>
+            <NavItem 
+              text="Play" 
+              dropdown 
+              aria-haspopup={true}
+              isOpen={activeDropdown === 'Play'}
+              onToggle={() => handleDropdownToggle('Play')}
+            />
+            <NavItem 
+              text="Participate" 
+              aria-haspopup={true}
+              isOpen={activeDropdown === 'Participate'}
+              onToggle={() => handleDropdownToggle('Participate')}
+            >
               <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
                 <div className="space-y-4">
                   <div>
@@ -296,7 +324,12 @@ const Navbar = () => {
                 </div>
               </div>
             </NavItem>
-            <NavItem text="Host" aria-haspopup={true}>
+            <NavItem 
+              text="Host" 
+              aria-haspopup={true}
+              isOpen={activeDropdown === 'Host'}
+              onToggle={() => handleDropdownToggle('Host')}
+            >
               <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
                 <div className="space-y-4">
                   <div>
@@ -326,7 +359,12 @@ const Navbar = () => {
                 </div>
               </div>
             </NavItem>
-            <NavItem text="F&B" aria-haspopup={true}>
+            <NavItem 
+              text="F&B" 
+              aria-haspopup={true}
+              isOpen={activeDropdown === 'F&B'}
+              onToggle={() => handleDropdownToggle('F&B')}
+            >
   <div className="absolute top-full left-0 bg-white shadow-lg p-4 w-64">
     <div className="space-y-4">
       <div>
@@ -369,9 +407,9 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             className="lg:hidden text-white p-2"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
@@ -380,12 +418,23 @@ const Navbar = () => {
           className={`
             lg:hidden
             transition-all duration-300 ease-in-out
-            ${isOpen ? 'max-h-screen' : 'max-h-0 overflow-hidden'}
+            ${isMenuOpen ? 'max-h-screen' : 'max-h-0 overflow-hidden'}
           `}
         >
           <div className="bg-black border-t border-gray-800">
-            <NavItem text="Play" dropdown isMobile />
-            <NavItem text="Participate" isMobile>
+            <NavItem 
+              text="Play" 
+              dropdown 
+              isMobile 
+              isOpen={activeDropdown === 'Play'}
+              onToggle={() => handleDropdownToggle('Play')}
+            />
+            <NavItem 
+              text="Participate" 
+              isMobile
+              isOpen={activeDropdown === 'Participate'}
+              onToggle={() => handleDropdownToggle('Participate')}
+            >
               <div className="bg-black p-4 space-y-4">
                 <div>
                    <Link href="https://playarena.in/academies/">
@@ -401,7 +450,12 @@ const Navbar = () => {
                 </div>
               </div>
             </NavItem>
-             <NavItem text="Host" isMobile>
+             <NavItem 
+              text="Host" 
+              isMobile
+              isOpen={activeDropdown === 'Host'}
+              onToggle={() => handleDropdownToggle('Host')}
+            >
               <div className="bg-black p-4 space-y-4">
                 <div>
                   <Link href="https://playarena.in/birthdays/">
@@ -429,7 +483,12 @@ const Navbar = () => {
                 </div>
               </div>
             </NavItem>
-            <NavItem text="F&B" isMobile>
+            <NavItem 
+              text="F&B" 
+              isMobile
+              isOpen={activeDropdown === 'F&B'}
+              onToggle={() => handleDropdownToggle('F&B')}
+            >
               <div className="bg-black p-4 space-y-4">
                 <div>
                   <Link href="https://playarena.in/foodcourt/">
